@@ -23,7 +23,8 @@ class HashTable:
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
-        return hash(key)
+        # return hash(key)
+        return self._hash_djb2(key)
 
 
     def _hash_djb2(self, key):
@@ -32,7 +33,11 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        hash_value = 7919
+        for i in key:
+            # Use ord() to convert str(i) to int(i)
+            hash_value = ((hash_value << 5) + hash_value) + ord(i)
+        return hash_value
 
 
     def _hash_mod(self, key):
@@ -54,8 +59,22 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        # Use _hash_mod method to generate integer index
+        idx = self._hash_mod(key)
+        
+        # # Using error message to handle collisions
+        # if self.storage[idx]:
+        #     print(f'Collision error at index: {idx}')
+        # else:
+        #     self.storage[idx] = (key, value)
 
+        # Using Linked List Chaining to handle collisions
+        # Create LinkedPair item
+        lp = LinkedPair(key, value)
+        # Set next to (key, value) at current index
+        lp.next = self.storage[idx]
+        # Change current index to desired LinkedPair
+        self.storage[idx] = lp
 
 
     def remove(self, key):
@@ -66,7 +85,21 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        idx = self._hash_mod(key)
+        item = self.storage[idx]
+        prev = None
+        
+        while item and item.key != key:
+            prev = item
+            item = item.next
+        if self.storage[idx] is None:
+            return f'Item not found!'
+        else:
+            if prev is None:
+                self.storage[idx] = item.next
+            else:
+                prev.next = item.next
+                
 
 
     def retrieve(self, key):
@@ -77,7 +110,17 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        # Get index of key
+        idx = self._hash_mod(key)
+        
+        item = self.storage[idx]
+
+        while item:
+            if item.key == key:
+                return item.value
+            else:
+                item = item.next        
+        return None
 
 
     def resize(self):
@@ -87,9 +130,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        old_storage = self.storage
+        self.capacity *= 2
+        new_storage = [None] * self.capacity
+        self.storage = new_storage
 
-
+        for i in old_storage:
+            while i:
+                self.insert(i.key, i.value)
+                i = i.next
+        
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -118,3 +168,5 @@ if __name__ == "__main__":
     print(ht.retrieve("line_3"))
 
     print("")
+
+    print(ht.remove('line_5'))
