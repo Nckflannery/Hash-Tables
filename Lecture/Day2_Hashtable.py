@@ -1,11 +1,11 @@
-# '''
-# Linked List hash table key/value pair
-# '''
 class LinkedPair:
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
+
+    def __str__(self):
+        return f'<{self.key}, {self.value}>'
 
 class HashTable:
     '''
@@ -15,7 +15,6 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-
 
     def _hash(self, key):
         '''
@@ -59,23 +58,20 @@ class HashTable:
 
         Fill this in.
         '''
-        # Use _hash_mod method to generate integer index
-        idx = self._hash_mod(key)
-        
-        # # Using error message to handle collisions
-        # if self.storage[idx]:
-        #     print(f'Collision error at index: {idx}')
-        # else:
-        #     self.storage[idx] = (key, value)
+        # Hashmod the key to find the bucket
+        index = self._hash_mod(key)
 
-        # Using Linked List Chaining to handle collisions
-        # Create LinkedPair item
-        lp = LinkedPair(key, value)
-        # Set next to (key, value) at current index
-        lp.next = self.storage[idx]
-        # Change current index to desired LinkedPair
-        self.storage[idx] = lp
-
+        # Check if a pair already exists in the bucket
+        pair = self.storage[index]
+        if pair:
+            # If so, overwrite the key/value and throw a warning
+            if pair.key != key:
+                print("Warning: Overwriting value")
+                pair.key = key
+            pair.value = value
+        else:
+            # If not, create a new LinkewPair and pace it in the bucket
+            self.storage[index]
 
     def remove(self, key):
         '''
@@ -85,21 +81,15 @@ class HashTable:
 
         Fill this in.
         '''
-        idx = self._hash_mod(key)
-        item = self.storage[idx]
-        prev = None
-        
-        while item is not None and item.key != key:
-            prev = item
-            item = item.next
-        if self.storage[idx] is None:
-            return f'Item not found!'
+        # Get index from hashmod
+        index = self._hash_mod[key]
+        # Check if a pair exists in the bucket with matching keys
+        if self.storage[index] and self.storage[index].key == key:
+            # If so, remove that pair
+            self.storage[index] = None
+        # Else, print warning
         else:
-            if prev is None:
-                self.storage[idx] = item.next
-            else:
-                prev.next = item.next
-                
+            print('Warning: Key does not exist')
 
 
     def retrieve(self, key):
@@ -110,17 +100,15 @@ class HashTable:
 
         Fill this in.
         '''
-        # Get index of key
-        idx = self._hash_mod(key)
-        
-        item = self.storage[idx]
-
-        while item:
-            if item.key == key:
-                return item.value
-            else:
-                item = item.next        
-        return None
+        # Get index from hashmod
+        index = self._hash_mod[key]
+        # Check if a pair exists in the bucket with matching keys
+        if self.storage[index] and self.storage[index].key == key:
+            # If so, return the value
+            return self.storage[index].value
+        # Else, return None
+        else:
+            return None
 
 
     def resize(self):
@@ -139,7 +127,7 @@ class HashTable:
             while i:
                 self.insert(i.key, i.value)
                 i = i.next
-        
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
