@@ -89,7 +89,7 @@ class HashTable:
         item = self.storage[idx]
         prev = None
         
-        while item and item.key != key:
+        while item is not None and item.key != key:
             prev = item
             item = item.next
         if self.storage[idx] is None:
